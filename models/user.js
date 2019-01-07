@@ -5,8 +5,10 @@ const userSchema = new Schema({
   first: String,
   last: String,
   googleId: String,
+  githubId: String,
   age: String,
-  email: String
+  email: String,
+  avatar: String
 });
 
 const User = mongoose.model("users", userSchema);

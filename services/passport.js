@@ -1,5 +1,6 @@
 const passport = require("passport");
 const googleStrategy = require("passport-google-oauth20").Strategy;
+const githubStrategy = require("passport-github").Strategy;
 const mongoose = require("mongoose");
 
 const User = mongoose.model("users");
@@ -11,6 +12,7 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser((id, done) => {
   User.findById(id).then(user => done(null, user));
 });
+
 passport.use(
   new googleStrategy(
     {
@@ -20,8 +22,15 @@ passport.use(
       proxy: true
     },
     async (accessToken, refreshToken, profile, done) => {
-      const existingUser = await User.findOne({ googleId: profile.id });
+      const existingUser = await User.findOne({
+        email: profile.emails[0].value
+      });
       if (existingUser) {
+        // Check if user previously logged-in with another o-auth provider
+        if (!existingUser.googleId) {
+          existingUser.googleId = profile.id;
+          await existingUser.save();
+        }
         return done(null, existingUser);
       }
       const user = await new User({
@@ -32,6 +41,39 @@ passport.use(
       }).save();
 
       done(null, user);
+    }
+  )
+);
+
+passport.use(
+  new githubStrategy(
+    {
+      clientID: process.env.GITHUBCLIENT,
+      clientSecret: process.env.GITHUBSECRET,
+      callbackURL: "/auth/github/callback",
+      proxy: true
+    },
+    async (accessToken, refreshToken, profile, cb) => {
+      const existingUser = await User.findOne({
+        email: profile.emails[0].value
+      });
+      if (existingUser) {
+        // Check if user previously logged-in with other o-auth provider
+        if (!existingUser.githubId) {
+          existingUser.githubId = profile.id;
+          await existingUser.save();
+        }
+        return cb(null, existingUser);
+      }
+      const user = await new User({
+        first: profile.displayName.split(" ")[0],
+        last: profile.displayName.split(" ")[1],
+        email: profile.emails[0].value,
+        avatar: profile.photos[0].value,
+        githubId: profile.id
+      }).save();
+
+      cb(null, user);
     }
   )
 );

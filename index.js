@@ -32,6 +32,7 @@ app.use(passport.session());
 app.use(cors());
 
 require("./routes/google-auth.routes")(app);
+require("./routes/github-auth.routes")(app);
 require("./routes/user.routes")(app);
 
 if (process.env.NODE_ENV === "production") {
