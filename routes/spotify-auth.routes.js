@@ -4,7 +4,11 @@ module.exports = app => {
   app.get(
     "/auth/spotify",
     passport.authenticate("spotify", {
-      scope: ["user-read-email", "user-read-private"],
+      scope: [
+        "user-read-email",
+        "user-read-private",
+        "user-read-recently-played"
+      ],
       showDialog: true
     }),
     (req, res) => {

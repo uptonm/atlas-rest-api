@@ -5,4 +5,6 @@ module.exports = app => {
   app.post("/api/users", actions.post);
   app.put("/api/users/:id", actions.put);
   app.delete("/api/users/:id", actions.delete);
+  app.get("/api/users/:id/spotify/playlists", actions.getPlaylists);
+  app.get("/api/users/:id/spotify/recentlyPlayed", actions.getRecentlyPlayed);
 };

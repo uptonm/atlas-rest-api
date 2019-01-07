@@ -7,6 +7,8 @@ const userSchema = new Schema({
   googleId: String,
   githubId: String,
   spotifyId: String,
+  spotifyRefresh: String,
+  spotifyAccess: String,
   age: String,
   email: String,
   avatar: String

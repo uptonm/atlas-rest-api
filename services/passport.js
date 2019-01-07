@@ -102,7 +102,9 @@ passport.use(
         email: profile.emails[0].value,
         first: profile.displayName.split(" ")[0],
         last: profile.displayName.split(" ")[1],
-        avatar: profile.photos[0]
+        avatar: profile.photos[0],
+        spotifyRefresh: refreshToken,
+        spotifyAccess: accessToken
       }).save();
       done(null, user);
     }

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const axios = require("axios");
 const User = mongoose.model("users");
 
 exports.get = async (req, res) => {
@@ -20,4 +21,41 @@ exports.put = async (req, res) => {
 exports.delete = async (req, res) => {
   const response = await User.findByIdAndDelete(req.params.id);
   res.send(response);
+};
+exports.getPlaylists = async (req, res) => {
+  const user = await User.findOne({ _id: req.params.id });
+  if (user.spotifyId) {
+    const data = await axios({
+      method: "get",
+      url: `https://api.spotify.com/v1/users/${user.spotifyId}/playlists`,
+      headers: {
+        Authorization: `Bearer ${user.spotifyAccess}`,
+        "Content-Type": "application/json"
+      }
+    });
+    res.send(data.data);
+  }
+};
+exports.getRecentlyPlayed = async (req, res) => {
+  const user = await User.findOne({ _id: req.params.id });
+  if (user.spotifyId) {
+    let data = await axios({
+      method: "get",
+      url: `https://api.spotify.com/v1/me/player/recently-played`,
+      headers: {
+        Authorization: `Bearer ${user.spotifyAccess}`,
+        "Content-Type": "application/json"
+      }
+    });
+    data = data.data.items;
+    let recentlyPlayed = data.map(item => {
+      return {
+        album: item.track.album.name,
+        title: item.track.name,
+        artist: item.track.artists[0].name,
+        preview: item.track.preview_url
+      };
+    });
+    res.send(recentlyPlayed);
+  }
 };
