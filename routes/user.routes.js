@@ -7,4 +7,6 @@ module.exports = app => {
   app.delete("/api/users/:id", actions.delete);
   app.get("/api/users/:id/spotify/playlists", actions.getPlaylists);
   app.get("/api/users/:id/spotify/recentlyPlayed", actions.getRecentlyPlayed);
+  app.get("/api/users/:id/github/issues", actions.getIssues);
+  app.get("/api/users/:id/github/repos", actions.getRepos);
 };

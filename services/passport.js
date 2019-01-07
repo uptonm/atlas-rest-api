@@ -71,7 +71,9 @@ passport.use(
         last: profile.displayName.split(" ")[1],
         email: profile.emails[0].value,
         avatar: profile.photos[0].value,
-        githubId: profile.id
+        githubId: profile.id,
+        githubRefresh: refreshToken,
+        githubAccess: accessToken
       }).save();
 
       cb(null, user);

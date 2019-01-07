@@ -6,6 +6,8 @@ const userSchema = new Schema({
   last: String,
   googleId: String,
   githubId: String,
+  githubRefresh: String,
+  githubAccess: String,
   spotifyId: String,
   spotifyRefresh: String,
   spotifyAccess: String,

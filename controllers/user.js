@@ -70,3 +70,33 @@ exports.getRecentlyPlayed = async (req, res) => {
     res.send(recentlyPlayed);
   }
 };
+
+exports.getIssues = async (req, res) => {
+  const user = await User.findOne({ _id: req.params.id });
+  if (user.githubId) {
+    const data = await axios({
+      method: "get",
+      url: `https://api.github.com/user/issues`,
+      headers: {
+        Authorization: `token ${user.githubAccess}`
+      }
+    });
+    // Format data
+    res.send(data.data);
+  }
+};
+
+exports.getRepos = async (req, res) => {
+  const user = await User.findOne({ _id: req.params.id });
+  if (user.githubId) {
+    const data = await axios({
+      method: "get",
+      url: `https://api.github.com/user/repos`,
+      headers: {
+        Authorization: `token ${user.githubAccess}`
+      }
+    });
+    // Format data
+    res.send(data.data);
+  }
+};
