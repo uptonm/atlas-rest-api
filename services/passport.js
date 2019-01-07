@@ -1,6 +1,7 @@
 const passport = require("passport");
 const googleStrategy = require("passport-google-oauth20").Strategy;
 const githubStrategy = require("passport-github").Strategy;
+const spotifyStrategy = require("passport-spotify").Strategy;
 const mongoose = require("mongoose");
 
 const User = mongoose.model("users");
@@ -74,6 +75,36 @@ passport.use(
       }).save();
 
       cb(null, user);
+    }
+  )
+);
+
+passport.use(
+  new spotifyStrategy(
+    {
+      clientID: process.env.SPOTIFYCLIENT,
+      clientSecret: process.env.SPOTIFYSECRET,
+      callbackURL: "http://localhost:8000/auth/spotify/callback"
+    },
+    async (accessToken, refreshToken, expires_in, profile, done) => {
+      const existingUser = await User.findOne({
+        email: profile.emails[0].value
+      });
+      if (existingUser) {
+        if (!existingUser.spotifyId) {
+          existingUser.spotifyId = profile.id;
+          await existingUser.save();
+        }
+        return done(null, existingUser);
+      }
+      const user = await new User({
+        spotifyId: profile.id,
+        email: profile.emails[0].value,
+        first: profile.displayName.split(" ")[0],
+        last: profile.displayName.split(" ")[1],
+        avatar: profile.photos[0]
+      }).save();
+      done(null, user);
     }
   )
 );
